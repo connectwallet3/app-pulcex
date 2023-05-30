@@ -39,3 +39,12 @@ button {
   cursor: pointer;
   height: 60px;
 }
+
+
+
+input::placeholder {
+  color: #fff;
+}
+input:focus {
+  outline: none;
+}

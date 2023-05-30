@@ -6,6 +6,8 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
 import ConnectPop from "../../components/connect/ConnectPop";
+import axios from "axios";
+import { Preloader } from "../exchange/Exchange";
 
 function Liquidity() {
   const [change, setChange] = useState(false);
@@ -20,13 +22,41 @@ function Liquidity() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const storedTokensList = localStorage.getItem("tokensList");
-    if (storedTokensList) {
-      const tokensList = JSON.parse(storedTokensList);
-      setTokens(tokensList);
-      setSelectedToken(tokensList[17]);
-      setSelectedToken2(tokensList[3]);
-    }
+    const fetchTokenData = async () => {
+      const options = {
+        method: "GET",
+        url: "https://api.coinranking.com/v2/coins",
+        params: {
+          limit: 5000,
+        },
+
+        headers: {
+          "x-access-token":
+            "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
+        },
+      };
+
+      axios
+        .request(options)
+        .then(function (response) {
+          const tokensList = response.data.data.coins;
+          const tokenDefault = tokensList.find(
+            (token) => token.symbol === "WPLS"
+          );
+          const tokenDefault2 = tokensList.find(
+            (token) => token.symbol === "XCAD"
+          );
+          console.log(tokensList);
+          setTokens(tokensList);
+          setSelectedToken(tokenDefault);
+          setSelectedToken2(tokenDefault2);
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
+    };
+
+    fetchTokenData();
   }, []);
 
   const filteredTokens = tokens.filter(
@@ -57,65 +87,77 @@ function Liquidity() {
             </div>
           </Box>
         ) : (
-          <Box2>
-            <div className="content">
-              <AiOutlineArrowLeft
-                className="icon"
-                onClick={() => setChange(false)}
-              />
-              <h3 onClick={() => setChange(false)}>Add Liquidity</h3>
-            </div>
-            <br />
-            <BackgroundDiv2>
-              <div className="left">
-                <input
-                  type="text"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-              </div>
-              <div className="right">
-                {selectedToken && (
-                  <div className="flex" onClick={() => setTokenModal(true)}>
-                    <img src={selectedToken.iconUrl} alt="" />
-                    <p>
-                      {selectedToken.symbol} &nbsp;
-                      <IoIosArrowDown />
-                    </p>
+          <>
+            {!selectedToken && !selectedToken2 ? (
+              <Box2>
+                <div className="load">
+                  <Preloader />
+                </div>
+              </Box2>
+            ) : (
+              <Box2>
+                <div className="content">
+                  <AiOutlineArrowLeft
+                    className="icon"
+                    onClick={() => setChange(false)}
+                  />
+                  <h3 onClick={() => setChange(false)}>Add Liquidity</h3>
+                </div>
+                <br />
+                <BackgroundDiv2>
+                  <div className="left">
+                    <input
+                      type="text"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                    />
                   </div>
-                )}
-              </div>
-            </BackgroundDiv2>
-            <div className="center">
-              <p>+</p>
-            </div>
-            <BackgroundDiv2>
-              <div className="left">
-                <input
-                  type="text"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-              </div>
-              <div className="right">
-                {selectedToken2 && (
-                  <div className="flex" onClick={() => setTokenModal2(true)}>
-                    <img src={selectedToken2.iconUrl} alt="" />
-                    <p>
-                      {selectedToken2.symbol} &nbsp;
-                      <IoIosArrowDown />
-                    </p>
+                  <div className="right">
+                    {selectedToken && (
+                      <div className="flex" onClick={() => setTokenModal(true)}>
+                        <img src={selectedToken.iconUrl} alt="" />
+                        <p>
+                          {selectedToken.symbol} &nbsp;
+                          <IoIosArrowDown />
+                        </p>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </BackgroundDiv2>
-            <br />
-            <button onClick={() => setConnect(true)}>Connect Wallet</button>
-            <br />
-          </Box2>
+                </BackgroundDiv2>
+                <div className="center">
+                  <p>+</p>
+                </div>
+                <BackgroundDiv2>
+                  <div className="left">
+                    <input
+                      type="text"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                    />
+                  </div>
+                  <div className="right">
+                    {selectedToken2 && (
+                      <div
+                        className="flex"
+                        onClick={() => setTokenModal2(true)}
+                      >
+                        <img src={selectedToken2.iconUrl} alt="" />
+                        <p>
+                          {selectedToken2.symbol} &nbsp;
+                          <IoIosArrowDown />
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </BackgroundDiv2>
+                <br />
+                <button onClick={() => setConnect(true)}>Connect Wallet</button>
+                <br />
+              </Box2>
+            )}
+          </>
         )}
       </LiqStyle>
-
 
       {connect && <ConnectPop connect={() => setConnect(false)} />}
 
@@ -217,6 +259,12 @@ const Box2 = styled.div`
   max-width: 448px;
   width: 100%;
   padding: 20px;
+
+  .load {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
   .head {
     padding: 10px 0;

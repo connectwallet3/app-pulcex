@@ -14,8 +14,8 @@ function Exchange() {
   const [connect, setConnect] = useState(false);
   const [tokenModal, setTokenModal] = useState(false);
   const [tokenModal2, setTokenModal2] = useState(false);
-  const [amount, setAmount] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [amount, setAmount] = useState(null);
+  const [price, setPrice] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
@@ -37,8 +37,16 @@ function Exchange() {
         .request(options)
         .then(function (response) {
           const tokensList = response.data.data.coins;
+          const tokenDefault = tokensList.find(
+            (token) => token.symbol === "WPLS"
+          );
+          const tokenDefault2 = tokensList.find(
+            (token) => token.symbol === "XCAD"
+          );
           console.log(tokensList);
-          localStorage.setItem("tokensList", JSON.stringify(tokensList));
+          setTokens(tokensList);
+          setSelectedToken(tokenDefault);
+          setSelectedToken2(tokenDefault2);
         })
         .catch(function (error) {
           console.error(error);
@@ -49,17 +57,7 @@ function Exchange() {
   }, []);
 
   useEffect(() => {
-    const storedTokensList = localStorage.getItem("tokensList");
-    if (storedTokensList) {
-      const tokensList = JSON.parse(storedTokensList);
-      setTokens(tokensList);
-      setSelectedToken(tokensList[17]);
-      setSelectedToken2(tokensList[3]);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (selectedToken2) {
+    if (selectedToken2 && amount) {
       const newPrice = amount * selectedToken2.change;
       setPrice(newPrice);
     }
@@ -78,59 +76,69 @@ function Exchange() {
           <title>Exchange | PulseX - $0.000</title>
         </Helmet>
 
-        <Box>
-          <div className="head">
-            <h3>Swap</h3>
-          </div>
-
-          <BackgroundDiv2>
-            <div className="left">
-              <input
-                type="text"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
+        {!selectedToken && !selectedToken2 ? (
+          <Box>
+            <div className="load">
+              <Preloader />
             </div>
-            <div className="right">
-              {selectedToken && (
-                <div className="flex" onClick={() => setTokenModal(true)}>
-                  <img src={selectedToken.iconUrl} alt="" />
-                  <p>
-                    {selectedToken.symbol} &nbsp;
-                    <IoIosArrowDown />
-                  </p>
-                </div>
-              )}
+          </Box>
+        ) : (
+          <Box>
+            <div className="head">
+              <h3>Swap</h3>
             </div>
-          </BackgroundDiv2>
 
-          <br />
+            <BackgroundDiv2>
+              <div className="left">
+                <input
+                  type="tel"
+                  value={amount}
+                  placeholder="0.0"
+                  onChange={(e) => setAmount(e.target.value)}
+                />
+              </div>
+              <div className="right">
+                {selectedToken && (
+                  <div className="flex" onClick={() => setTokenModal(true)}>
+                    <img src={selectedToken.iconUrl} alt="" />
+                    <p>
+                      {selectedToken.symbol} &nbsp;
+                      <IoIosArrowDown />
+                    </p>
+                  </div>
+                )}
+              </div>
+            </BackgroundDiv2>
 
-          <BackgroundDiv2>
-            <div className="left">
-              <input
-                type="text"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-            <div className="right">
-              {selectedToken2 && (
-                <div className="flex" onClick={() => setTokenModal2(true)}>
-                  <img src={selectedToken2.iconUrl} alt="" />
-                  <p>
-                    {selectedToken2.symbol} &nbsp;
-                    <IoIosArrowDown />
-                  </p>
-                </div>
-              )}
-            </div>
-          </BackgroundDiv2>
+            <br />
 
-          <br />
+            <BackgroundDiv2>
+              <div className="left">
+                <input
+                  type="tel"
+                  value={price}
+                  placeholder="0.0"
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </div>
+              <div className="right">
+                {selectedToken2 && (
+                  <div className="flex" onClick={() => setTokenModal2(true)}>
+                    <img src={selectedToken2.iconUrl} alt="" />
+                    <p>
+                      {selectedToken2.symbol} &nbsp;
+                      <IoIosArrowDown />
+                    </p>
+                  </div>
+                )}
+              </div>
+            </BackgroundDiv2>
 
-          <button onClick={() => setConnect(true)}>Connect Wallet</button>
-        </Box>
+            <br />
+
+            <button onClick={() => setConnect(true)}>Connect Wallet</button>
+          </Box>
+        )}
       </LiqStyle>
 
       {connect && <ConnectPop connect={() => setConnect(false)} />}
@@ -235,6 +243,12 @@ const Box = styled.div`
 
   .head {
     padding: 10px 0;
+  }
+
+  .load {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;
 
@@ -387,4 +401,35 @@ const PageContent = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
+`;
+
+export const Preloader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: transparent;
+  animation: spin 1s linear infinite;
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  &::after {
+    content: "";
+    display: block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 5px solid #8f058a;
+    border-color: #fff transparent #8f058a transparent;
+    animation: spin 0.7s ease-in-out infinite;
+  }
 `;

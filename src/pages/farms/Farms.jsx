@@ -4,6 +4,8 @@ import { Helmet } from "react-helmet";
 import { PageLayout } from "../../globalStyle";
 import styled from "styled-components";
 import ConnectPop from "../../components/connect/ConnectPop";
+import axios from "axios";
+import { Preloader } from "../exchange/Exchange";
 
 function Farms() {
   const [tokens, setTokens] = useState([]);
@@ -12,11 +14,39 @@ function Farms() {
   const [connect, setConnect] = useState(false);
 
   useEffect(() => {
-    const storedTokensList = localStorage.getItem("tokensList");
-    if (storedTokensList) {
-      const tokensList = JSON.parse(storedTokensList);
-      setTokens(tokensList);
-    }
+    const fetchTokenData = async () => {
+      const options = {
+        method: "GET",
+        url: "https://api.coinranking.com/v2/coins",
+        params: {
+          limit: 5000,
+        },
+
+        headers: {
+          "x-access-token":
+            "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
+        },
+      };
+
+      axios
+        .request(options)
+        .then(function (response) {
+          const tokensList = response.data.data.coins;
+          const tokenDefault = tokensList.find(
+            (token) => token.symbol === "WPLS"
+          );
+          const tokenDefault2 = tokensList.find(
+            (token) => token.symbol === "XCAD"
+          );
+          console.log(tokensList);
+          setTokens(tokensList);
+        })
+        .catch(function (error) {
+          console.error(error);
+        });
+    };
+
+    fetchTokenData();
   }, []);
 
   const filteredTokens = tokens.filter(
@@ -69,39 +99,45 @@ function Farms() {
           </FarmStyle>
 
           {tab === 1 && (
-            <Grid>
-              {filteredTokens.slice(0, 20).map((token, key) => (
-                <Box key={token.uuid}>
-                  <div className="head">
-                    <img src={token.iconUrl} alt="" />
-                    <h2>{token.symbol}</h2>
-                  </div>
+            <>
+              {!filteredTokens ? (
+                <Preloader />
+              ) : (
+                <Grid>
+                  {filteredTokens.slice(0, 20).map((token, key) => (
+                    <Box key={token.uuid}>
+                      <div className="head">
+                        <img src={token.iconUrl} alt="" />
+                        <h2>{token.symbol}</h2>
+                      </div>
 
-                  <ul>
-                    <li>
-                      <p>APR:</p>
-                      <p>{token.change}%</p>
-                    </li>
-                    <li>
-                      <p>Earn:</p>
-                      <p>INC + Fees</p>
-                    </li>
+                      <ul>
+                        <li>
+                          <p>APR:</p>
+                          <p>{token.change}%</p>
+                        </li>
+                        <li>
+                          <p>Earn:</p>
+                          <p>INC + Fees</p>
+                        </li>
 
-                    <li>
-                      <p>INC EARNED</p>
-                    </li>
-                    <li>
-                      <p className="zero">0.00</p>
-                      <button>Harvest</button>
-                    </li>
-                  </ul>
-                  <p className="small">DAI FROM ETHEREUM-WPLS LP STAKED</p>
-                  <button onClick={() => setConnect(true)}>
-                    Connect Wallet
-                  </button>
-                </Box>
-              ))}
-            </Grid>
+                        <li>
+                          <p>INC EARNED</p>
+                        </li>
+                        <li>
+                          <p className="zero">0.00</p>
+                          <button>Harvest</button>
+                        </li>
+                      </ul>
+                      <p className="small">DAI FROM ETHEREUM-WPLS LP STAKED</p>
+                      <button onClick={() => setConnect(true)}>
+                        Connect Wallet
+                      </button>
+                    </Box>
+                  ))}
+                </Grid>
+              )}
+            </>
           )}
         </PageLayout>
       </LiqStyle>
@@ -175,6 +211,10 @@ const Grid = styled.div`
   row-gap: 36px;
   column-gap: 18px;
   margin: 20px 0;
+
+  @media (max-width: 480px){
+    grid-template-columns: 1fr;
+  }
 `;
 
 const Box = styled.div`
