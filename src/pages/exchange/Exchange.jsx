@@ -1,4 +1,4 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { LiqStyle } from "../liquidity/styled";
 import { Helmet } from "react-helmet";
@@ -6,9 +6,10 @@ import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
 import { PageLayout } from "../../globalStyle";
 import ConnectPop from "../../components/connect/ConnectPop";
+import Data from "../../data/Data";
 
 function Exchange() {
-  const [tokens, setTokens] = useState([]);
+  // const [tokens] = useState(Data);
   const [selectedToken, setSelectedToken] = useState();
   const [selectedToken2, setSelectedToken2] = useState();
   const [connect, setConnect] = useState(false);
@@ -18,42 +19,53 @@ function Exchange() {
   const [price, setPrice] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // useEffect(() => {
+  //   const fetchTokenData = async () => {
+  //     const options = {
+  //       method: "GET",
+  //       url: "https://api.coinranking.com/v2/coins",
+  //       params: {
+  //         limit: 5000,
+  //       },
+
+  //       headers: {
+  //         "x-access-token":
+  //           "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
+  //       },
+  //     };
+
+  //     axios
+  //       .request(options)
+  //       .then(function (response) {
+  //         const tokensList = response.data.data.coins;
+  //         const tokenDefault = tokensList.find(
+  //           (token) => token.symbol === "WPLS"
+  //         );
+  //         const tokenDefault2 = tokensList.find(
+  //           (token) => token.symbol === "XCAD"
+  //         );
+  //         console.log(tokensList);
+  //         localStorage.setItem("tokensList", JSON.stringify(tokensList));
+  //         setTokens(tokensList);
+  //         setSelectedToken(tokenDefault);
+  //         setSelectedToken2(tokenDefault2);
+
+  //         console.log(JSON.stringify(tokensList, null, 2));
+  //       })
+  //       .catch(function (error) {
+  //         console.error(error);
+  //       });
+  //   };
+
+  //   fetchTokenData();
+  // }, []);
+
   useEffect(() => {
-    const fetchTokenData = async () => {
-      const options = {
-        method: "GET",
-        url: "https://api.coinranking.com/v2/coins",
-        params: {
-          limit: 10,
-        },
+    const tokenDefault = Data.find((token) => token.symbol === "WPLS");
+    const tokenDefault2 = Data.find((token) => token.symbol === "XCAD");
 
-        headers: {
-          "x-access-token":
-            "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
-        },
-      };
-
-      axios
-        .request(options)
-        .then(function (response) {
-          const tokensList = response.data.data.coins;
-          const tokenDefault = tokensList.find(
-            (token) => token.symbol === "WPLS"
-          );
-          const tokenDefault2 = tokensList.find(
-            (token) => token.symbol === "XCAD"
-          );
-          console.log(tokensList);
-          setTokens(tokensList);
-          setSelectedToken(tokenDefault);
-          setSelectedToken2(tokenDefault2);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
-
-    fetchTokenData();
+    setSelectedToken(tokenDefault);
+    setSelectedToken2(tokenDefault2);
   }, []);
 
   useEffect(() => {
@@ -63,7 +75,7 @@ function Exchange() {
     }
   }, [amount, selectedToken2]);
 
-  const filteredTokens = tokens.filter(
+  const filteredTokens = Data.filter(
     (token) =>
       token.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       token.symbol.toLowerCase().includes(searchTerm.toLowerCase())

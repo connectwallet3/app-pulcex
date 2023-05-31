@@ -4,52 +4,53 @@ import { Helmet } from "react-helmet";
 import { PageLayout } from "../../globalStyle";
 import styled from "styled-components";
 import ConnectPop from "../../components/connect/ConnectPop";
-import axios from "axios";
 import { Preloader } from "../exchange/Exchange";
+import Data from "../../data/Data"
 
 function Farms() {
-  const [tokens, setTokens] = useState([]);
+  // const [tokens, setTokens] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [tab, setTab] = useState(1);
   const [connect, setConnect] = useState(false);
 
-  useEffect(() => {
-    const fetchTokenData = async () => {
-      const options = {
-        method: "GET",
-        url: "https://api.coinranking.com/v2/coins",
-        params: {
-          limit: 10,
-        },
+  // useEffect(() => {
+  //   const fetchTokenData = async () => {
+  //     const options = {
+  //       method: "GET",
+  //       url: "https://api.coinranking.com/v2/coins",
+  //       params: {
+  //         limit: 10,
+  //       },
 
-        headers: {
-          "x-access-token":
-            "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
-        },
-      };
+  //       headers: {
+  //         "x-access-token":
+  //           "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
+  //       },
+  //     };
 
-      axios
-        .request(options)
-        .then(function (response) {
-          const tokensList = response.data.data.coins;
-          const tokenDefault = tokensList.find(
-            (token) => token.symbol === "WPLS"
-          );
-          const tokenDefault2 = tokensList.find(
-            (token) => token.symbol === "XCAD"
-          );
-          console.log(tokensList);
-          setTokens(tokensList);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
+  //     axios
+  //       .request(options)
+  //       .then(function (response) {
+  //         const tokensList = response.data.data.coins;
+  //         const tokenDefault = tokensList.find(
+  //           (token) => token.symbol === "WPLS"
+  //         );
+  //         const tokenDefault2 = tokensList.find(
+  //           (token) => token.symbol === "XCAD"
+  //         );
+  //         console.log(tokensList);
+  //         setTokens(tokensList);
+  //       })
+  //       .catch(function (error) {
+  //         console.error(error);
+  //       });
+  //   };
 
-    fetchTokenData();
-  }, []);
+  //   fetchTokenData();
+  // }, []);
 
-  const filteredTokens = tokens.filter(
+ 
+  const filteredTokens = Data.filter(
     (token) =>
       token.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       token.symbol.toLowerCase().includes(searchTerm.toLowerCase())
@@ -212,6 +213,9 @@ const Grid = styled.div`
   column-gap: 18px;
   margin: 20px 0;
 
+  @media (max-width: 777px){
+    grid-template-columns: 1fr 1fr;
+  }
   @media (max-width: 480px){
     grid-template-columns: 1fr;
   }

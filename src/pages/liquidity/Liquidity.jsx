@@ -6,60 +6,30 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import styled from "styled-components";
 import { IoIosArrowDown } from "react-icons/io";
 import ConnectPop from "../../components/connect/ConnectPop";
-import axios from "axios";
 import { Preloader } from "../exchange/Exchange";
+import Data from "../../data/Data";
 
 function Liquidity() {
   const [change, setChange] = useState(false);
-  const [tokens, setTokens] = useState([]);
+  // const [tokens, setTokens] = useState([]);
   const [selectedToken, setSelectedToken] = useState();
   const [selectedToken2, setSelectedToken2] = useState();
   const [connect, setConnect] = useState(false);
   const [tokenModal, setTokenModal] = useState(false);
   const [tokenModal2, setTokenModal2] = useState(false);
-  const [amount, setAmount] = useState(0);
-  const [price, setPrice] = useState(0);
+  const [amount, setAmount] = useState(null);
+  const [price, setPrice] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    const fetchTokenData = async () => {
-      const options = {
-        method: "GET",
-        url: "https://api.coinranking.com/v2/coins",
-        params: {
-          limit: 10,
-        },
+    const tokenDefault = Data.find((token) => token.symbol === "WPLS");
+    const tokenDefault2 = Data.find((token) => token.symbol === "XCAD");
 
-        headers: {
-          "x-access-token":
-            "coinranking0ba0a98b9fd652a9629cbe19f53764b58ec4739a579a764a",
-        },
-      };
-
-      axios
-        .request(options)
-        .then(function (response) {
-          const tokensList = response.data.data.coins;
-          const tokenDefault = tokensList.find(
-            (token) => token.symbol === "WPLS"
-          );
-          const tokenDefault2 = tokensList.find(
-            (token) => token.symbol === "XCAD"
-          );
-          console.log(tokensList);
-          setTokens(tokensList);
-          setSelectedToken(tokenDefault);
-          setSelectedToken2(tokenDefault2);
-        })
-        .catch(function (error) {
-          console.error(error);
-        });
-    };
-
-    fetchTokenData();
+    setSelectedToken(tokenDefault);
+    setSelectedToken2(tokenDefault2);
   }, []);
 
-  const filteredTokens = tokens.filter(
+  const filteredTokens = Data.filter(
     (token) =>
       token.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       token.symbol.toLowerCase().includes(searchTerm.toLowerCase())
@@ -107,8 +77,9 @@ function Liquidity() {
                 <BackgroundDiv2>
                   <div className="left">
                     <input
-                      type="text"
+                      type="tel"
                       value={amount}
+                      placeholder="0.0"
                       onChange={(e) => setAmount(e.target.value)}
                     />
                   </div>
@@ -130,8 +101,9 @@ function Liquidity() {
                 <BackgroundDiv2>
                   <div className="left">
                     <input
-                      type="text"
+                      type="tel"
                       value={price}
+                      placeholder="0.0"
                       onChange={(e) => setPrice(e.target.value)}
                     />
                   </div>
