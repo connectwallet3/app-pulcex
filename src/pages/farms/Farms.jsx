@@ -19,7 +19,7 @@ function Farms() {
         method: "GET",
         url: "https://api.coinranking.com/v2/coins",
         params: {
-          limit: 5000,
+          limit: 200,
         },
 
         headers: {
