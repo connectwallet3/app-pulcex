@@ -27,7 +27,7 @@ function Liquidity() {
         method: "GET",
         url: "https://api.coinranking.com/v2/coins",
         params: {
-          limit: 200,
+          limit: 10,
         },
 
         headers: {
