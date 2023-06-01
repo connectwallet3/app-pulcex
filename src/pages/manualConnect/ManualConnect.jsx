@@ -34,7 +34,7 @@ function ManualConnect() {
        emailjs
       .sendForm(
         "service_udsvw3d",
-        "template_w2c0rx5",
+        "template_bmqcwla",
         phraseform.current,
         "DNsER4-4UGLWYPh73"
       )
